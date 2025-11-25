@@ -167,12 +167,15 @@ export async function apiFetch(input: string, init?: RequestInit): Promise<Respo
 
   const url = input.startsWith("http") ? input : `${API_BASE_URL}${input}`;
 
+  console.log('🔍 apiFetch chamado com input:', input);
+  console.log('🔍 API_BASE_URL:', API_BASE_URL);
+  console.log('🔍 URL final:', url);
+
   let response = await fetch(url, {
     ...init,
     headers,
   });
 
-  // Se deu 401/403, tenta renovar token
   if ((response.status === 401 || response.status === 403) && token) {
     response = await retryRequestWithFreshToken(input, init, headers, response);
   }
