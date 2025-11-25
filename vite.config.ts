@@ -17,15 +17,6 @@ export default defineConfig(({ mode }) => {
       include: ['src/**/*.{test,test.*}.{ts,tsx}', 'src/**/*.test.{ts,tsx}', 'src/**/*.test.tsx'],
       exclude: ['e2e/**', 'playwright.config.{ts,js}', 'node_modules/**', 'dist/**'],
     },
-    server: {
-      proxy: {
-        '/api': {
-          target: backendUrl,
-          changeOrigin: true,
-          // rewrite: (path) => path.replace(/^\/api/, ''),
-        },
-      },
-    },
     resolve: {
       alias: { '@': resolve(__dirname, 'src') },
     },
