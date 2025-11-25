@@ -167,16 +167,19 @@ export async function apiFetch(input: string, init?: RequestInit): Promise<Respo
 
   const url = input.startsWith("http") ? input : `${API_BASE_URL}${input}`;
 
-  console.log('🔍 apiFetch chamado com input:', input);
-  console.log('🔍 API_BASE_URL:', API_BASE_URL);
-  console.log('🔍 URL final:', url);
+  console.log('🔍 apiFetch URL:', url);
+  console.log('🔑 Token presente?', !!token);
 
   let response = await fetch(url, {
     ...init,
     headers,
   });
 
-  if ((response.status === 401 || response.status === 403) && token) {
+  console.log('📊 Response status:', response.status);
+
+  // Se deu 401, tenta renovar token
+  // Mas se deu 403, NÃO faz logout automático - deixa o service/component tratar
+  if (response.status === 401 && token) {
     response = await retryRequestWithFreshToken(input, init, headers, response);
   }
 
