@@ -142,7 +142,7 @@ async function retryRequestWithFreshToken(
   const url = input.startsWith("http") ? input : `${API_BASE_URL}${input}`;
   const retryResponse = await fetch(url, { ...init, headers })
 
-  if (retryResponse.status === 401 || retryResponse.status === 403) {
+  if (retryResponse.status === 401) {
     clearAuthTokens()
     redirectToLoginIfNeeded()
   }
@@ -167,20 +167,18 @@ export async function apiFetch(input: string, init?: RequestInit): Promise<Respo
 
   const url = input.startsWith("http") ? input : `${API_BASE_URL}${input}`;
 
-  console.log('🔍 apiFetch URL:', url);
-  console.log('🔑 Token presente?', !!token);
-
   let response = await fetch(url, {
     ...init,
     headers,
   });
 
-  console.log('📊 Response status:', response.status);
-
-  // Se deu 401, tenta renovar token
-  // Mas se deu 403, NÃO faz logout automático - deixa o service/component tratar
-  if (response.status === 401 && token) {
-    response = await retryRequestWithFreshToken(input, init, headers, response);
+  // Se deu 401, tenta renovar token (403 = sem permissão, não precisa renovar)
+  if (response.status === 401) {
+    if (token) {
+      response = await retryRequestWithFreshToken(input, init, headers, response);
+    } else {
+      redirectToLoginIfNeeded();
+    }
   }
 
   return response;
