@@ -1,4 +1,4 @@
-import { apiFetch, API_BASE_URL } from "@/lib/api"
+import { apiFetch } from "@/lib/api"
 import type { ChatMessage, ChatSession, ChatIdeaSummary } from "@/types/chat"
 
 export const chatService = {
