@@ -1,4 +1,4 @@
-import { apiFetch } from "@/lib/api"
+import { apiFetch, API_BASE_URL } from "@/lib/api"
 import type { ChatMessage, ChatSession, ChatIdeaSummary } from "@/types/chat"
 
 export const chatService = {
@@ -57,11 +57,11 @@ export const chatService = {
     before: string, 
     limit: number = 20
   ): Promise<{ messages: ChatMessage[]; hasMore: boolean }> {
-    const url = new URL(`/api/chat/sessions/${sessionId}/messages`, window.location.origin)
-    url.searchParams.set('before', before)
-    url.searchParams.set('limit', limit.toString())
+    const params = new URLSearchParams()
+    params.set('before', before)
+    params.set('limit', limit.toString())
 
-    const response = await apiFetch(url.pathname + url.search)
+    const response = await apiFetch(`/api/chat/sessions/${sessionId}/messages?${params.toString()}`)
 
     if (!response.ok) {
       const errorText = await response.text()
@@ -128,12 +128,15 @@ export const chatService = {
       hasPrevious: boolean;
     };
   }> {
-    const url = new URL('/api/chat/logs', window.location.origin)
-    if (params?.date) url.searchParams.set('date', params.date)
-    if (params?.page) url.searchParams.set('page', params.page.toString())
-    if (params?.size) url.searchParams.set('size', params.size.toString())
+    const params_url = new URLSearchParams()
+    if (params?.date) params_url.set('date', params.date)
+    if (params?.page) params_url.set('page', params.page.toString())
+    if (params?.size) params_url.set('size', params.size.toString())
 
-    const response = await apiFetch(url.pathname + url.search)
+    const queryString = params_url.toString()
+    const endpoint = queryString ? `/api/chat/logs?${queryString}` : '/api/chat/logs'
+
+    const response = await apiFetch(endpoint)
 
     if (!response.ok) {
       let errorMessage = 'Erro ao buscar logs'
@@ -198,13 +201,16 @@ export const chatService = {
       hasPrevious: boolean;
     };
   }> {
-    const url = new URL('/api/chat/admin/logs', window.location.origin)
-    if (params?.date) url.searchParams.set('date', params.date)
-    if (params?.userId) url.searchParams.set('userId', params.userId.toString())
-    if (params?.page) url.searchParams.set('page', params.page.toString())
-    if (params?.size) url.searchParams.set('size', params.size.toString())
+    const params_url = new URLSearchParams()
+    if (params?.date) params_url.set('date', params.date)
+    if (params?.userId) params_url.set('userId', params.userId.toString())
+    if (params?.page) params_url.set('page', params.page.toString())
+    if (params?.size) params_url.set('size', params.size.toString())
 
-    const response = await apiFetch(url.pathname + url.search)
+    const queryString = params_url.toString()
+    const endpoint = queryString ? `/api/chat/admin/logs?${queryString}` : '/api/chat/admin/logs'
+
+    const response = await apiFetch(endpoint)
 
     if (!response.ok) {
       let errorMessage = 'Erro ao buscar logs de administrador'
@@ -256,4 +262,3 @@ function mapResponseToMessage(data: any): ChatMessage {
     tokensRemaining: data.tokensRemaining ?? null,
   }
 }
-
